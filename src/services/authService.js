@@ -1,11 +1,12 @@
-const User = require('../models/User.js');
+const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const UserDTO = require('../dto/userDTO.js');
 
 class AuthService {
     async register({ username, email, password }) {
         const user = await User.create({ username, email, password });
-        return { id: user.id, username: user.username, email: user.email };
+        return new UserDTO(user);
     }
 
     async login({ email, password }) {
@@ -14,9 +15,9 @@ class AuthService {
             throw new Error('Invalid credentials');
         }
         const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
-            expiresIn: '15m',
+            expiresIn: '1h',
         });
-        return { token, user: { id: user.id, username: user.username, email: user.email } };
+        return { token, user: new UserDTO(user) };
     }
 }
 

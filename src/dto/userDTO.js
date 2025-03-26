@@ -5,4 +5,5 @@ class UserDTO {
         this.email = user.email;
     }
 }
+
 module.exports = UserDTO;
