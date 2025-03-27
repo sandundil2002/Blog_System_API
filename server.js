@@ -10,12 +10,21 @@ const errorHandler = require('./src/middleware/errorHandler.js');
 const cookieParser = require('cookie-parser');
 const { validationResult } = require('express-validator');
 
-const app = express();
-app.use(cookieParser());
-const server = http.createServer(app);
-const io = socketIo(server);
-app.use(express.json());
 dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT;
+
+app.use(cookieParser());
+app.use(express.json());
+
+const server = http.createServer(app);
+const io = socketIo(server, {
+    cors: {
+        origin: '*',
+        methods: ['GET', 'POST']
+    }
+});
 
 app.use((req, res, next) => {
     req.io = io;
@@ -26,14 +35,15 @@ const validate = (validations) => {
     return async (req, res, next) => {
         await Promise.all(validations.map((validation) => validation.run(req)));
         const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
         next();
     };
 };
 
 app.post('/auth/register', validate(authController.validationRules.register), authController.register);
 app.post('/auth/login', validate(authController.validationRules.login), authController.login);
-
 app.get('/posts', postController.getAllPosts);
 app.get('/posts/:id', postController.getPostById);
 app.post('/posts', authMiddleware, postController.createPost);
@@ -42,8 +52,21 @@ app.delete('/posts/:id', authMiddleware, postController.deletePost);
 
 app.use(errorHandler);
 
-sequelize.sync().then(() => {
-    app.listen(process.env.PORT, () => {
-        console.log(`Server running on port ${process.env.PORT}`);
+io.on('connection', (socket) => {
+    console.log('New client connected');
+    socket.on('disconnect', () => {
+        console.log('Client disconnected');
     });
 });
+
+sequelize.sync()
+    .then(() => {
+        server.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+    })
+    .catch((error) => {
+        console.error('Unable to connect to the database:', error);
+    });
+
+module.exports = { app, server, io };

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Test</title>
+</head>
+<body>
+<h1>WebSocket functions Test</h1>
+<ul id="updates"></ul>
+<script src="http://localhost:3000/socket.io/socket.io.js"></script>
+<script>
+    const socket = io('http://localhost:3000');
+
+    socket.on('connect', () => {
+        console.log('Connected to WebSocket server');
+    });
+
+    socket.on('postCreated', (post) => {
+        console.log('New post created:', post);
+        addUpdate(`New Post: ${post.title}`);
+    });
+
+    socket.on('postUpdated', (post) => {
+        console.log('Post updated:', post);
+        addUpdate(`Updated Post: ${post.title}`);
+    });
+
+    socket.on('postDeleted', (data) => {
+        console.log('Post deleted:', data);
+        addUpdate(`Deleted Post ID: ${data.id}`);
+    });
+
+    function addUpdate(message) {
+        const li = document.createElement('li');
+        li.textContent = message;
+        document.getElementById('updates').appendChild(li);
+    }
+</script>
+</body>
+</html>

@@ -25,7 +25,10 @@ const validationRules = {
         check('email').isEmail(),
         check('password').isLength({ min: 6 }),
     ],
-    login: [check('email').isEmail(), check('password').notEmpty()],
+    login: [
+        check('email').isEmail(),
+        check('password').notEmpty()
+    ],
 };
 
 module.exports = { register, login, validationRules };
