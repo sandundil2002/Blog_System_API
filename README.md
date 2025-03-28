@@ -15,6 +15,10 @@ Here're some of the project's best features:
 *   WebSocket integration with socket.io
 *   JWT for secure authentication
 
+<h2>🚀 Demo</h2>
+
+[video demonstration](https://drive.google.com/file/d/1wGiqaw9kbF7eXFXA-nP6pq645Egvpbtt/view?usp=sharing)
+
 <h2>🛠️ Installation Steps:</h2>
 
 <p>1. Clone the repository:</p>
